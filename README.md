@@ -2,8 +2,6 @@
 
 Sfera di 40.000 particelle realizzata in WebGPU puro (nessuna libreria: no Three.js, nessuna dipendenza esterna), con rim lighting neon, bloom, linee di energia procedurali e scie luminose casuali. Loop seamless di 20 secondi.
 
-Ispirata al video Vecteezy: https://www.vecteezy.com/video/70810576
-
 ## Demo
 
 https://particle-sphere.pages.dev
