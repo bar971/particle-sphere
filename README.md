@@ -6,7 +6,7 @@ Ispirata al video Vecteezy: https://www.vecteezy.com/video/70810576
 
 ## Demo
 
-_(URL live in arrivo)_
+https://particle-sphere.pages.dev
 
 ## Requisiti
 
