@@ -42,6 +42,11 @@ Piano approvato completo in: `C:\Users\chris\.claude\plans\vorrei-replicare-l-ef
 2. FPS da misurare con tab in primo piano
 3. Confronto col video VERO in riproduzione mai riuscito (il player Vecteezy mostra solo il frame iniziale statico)
 
+## Pubblicazione (2026-08-13)
+- Repo GitHub pubblico: https://github.com/bar971/particle-sphere (branch `main`, account bar971)
+- Demo live su Cloudflare Pages: https://particle-sphere.pages.dev (progetto `particle-sphere`, account Cloudflare bar971@yahoo.it; deploy da cartella pulita con solo index.html + js/ + shaders/, via `npx wrangler pages deploy`)
+- Verifica deploy: HTTP 200 con `<title>Particle Sphere</title>` nel body
+
 ## Note operative
-- Il progetto NON è un repo git (valutare `git init` alla ripresa se si vuole versionare)
+- Repo git attivo su `main` con remote `origin` → GitHub
 - Lezione di sessione salvata in memoria: i subagent ereditano la plan mode del coordinator → uscire con ExitPlanMode prima di delegare implementazioni
