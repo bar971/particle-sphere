@@ -25,4 +25,3 @@ Poi apri http://localhost:8420 nel browser.
 - `index.html` — canvas full-viewport e inizializzazione WebGPU
 - `js/` — logica applicativa (init WebGPU, particelle, linee, bloom, sfondo, scie luminose, matematica)
 - `shaders/` — shader WGSL (compute e render) per particelle, linee, bloom, sfondo, scie
-- `HANDOFF.md` — note tecniche di sviluppo e stato del progetto
