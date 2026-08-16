@@ -21,21 +21,12 @@ function fibonacciSphere(n, radius) {
   return points;
 }
 
-export async function createParticleSystem(device, uniformBuffer, sceneFormat) {
-  const basePositions = fibonacciSphere(PARTICLE_COUNT, SPHERE_RADIUS);
-
-  const baseBuffer = device.createBuffer({
-    size: basePositions.byteLength,
-    usage: GPUBufferUsage.STORAGE,
-    mappedAtCreation: true,
-  });
-  new Float32Array(baseBuffer.getMappedRange()).set(basePositions);
-  baseBuffer.unmap();
-
-  const outBuffer = device.createBuffer({
-    size: PARTICLE_COUNT * 8 * 4, // vec4 pos + vec4 color
-    usage: GPUBufferUsage.STORAGE,
-  });
+export async function createParticleSystem(device, uniformBuffer, sceneFormat, initialCount = PARTICLE_COUNT) {
+  let currentCount = initialCount;
+  let baseBuffer = null;
+  let outBuffer = null;
+  let computeBindGroup = null;
+  let renderBindGroup = null;
 
   const [computeCode, renderCode] = await Promise.all([
     fetch('shaders/particles.compute.wgsl').then((r) => r.text()),
@@ -48,15 +39,6 @@ export async function createParticleSystem(device, uniformBuffer, sceneFormat) {
   const computePipeline = device.createComputePipeline({
     layout: 'auto',
     compute: { module: computeModule, entryPoint: 'main' },
-  });
-
-  const computeBindGroup = device.createBindGroup({
-    layout: computePipeline.getBindGroupLayout(0),
-    entries: [
-      { binding: 0, resource: { buffer: uniformBuffer } },
-      { binding: 1, resource: { buffer: baseBuffer } },
-      { binding: 2, resource: { buffer: outBuffer } },
-    ],
   });
 
   const renderPipeline = device.createRenderPipeline({
@@ -78,24 +60,68 @@ export async function createParticleSystem(device, uniformBuffer, sceneFormat) {
     primitive: { topology: 'triangle-strip' },
   });
 
-  const renderBindGroup = device.createBindGroup({
-    layout: renderPipeline.getBindGroupLayout(0),
-    entries: [
-      { binding: 0, resource: { buffer: uniformBuffer } },
-      { binding: 1, resource: { buffer: outBuffer } },
-    ],
-  });
+  function allocateBuffers(count) {
+    if (baseBuffer) {
+      baseBuffer.destroy();
+    }
+    if (outBuffer) {
+      outBuffer.destroy();
+    }
+
+    currentCount = count;
+    const basePositions = fibonacciSphere(currentCount, SPHERE_RADIUS);
+
+    baseBuffer = device.createBuffer({
+      size: basePositions.byteLength,
+      usage: GPUBufferUsage.STORAGE,
+      mappedAtCreation: true,
+    });
+    new Float32Array(baseBuffer.getMappedRange()).set(basePositions);
+    baseBuffer.unmap();
+
+    outBuffer = device.createBuffer({
+      size: currentCount * 8 * 4, // vec4 pos + vec4 color
+      usage: GPUBufferUsage.STORAGE,
+    });
+
+    computeBindGroup = device.createBindGroup({
+      layout: computePipeline.getBindGroupLayout(0),
+      entries: [
+        { binding: 0, resource: { buffer: uniformBuffer } },
+        { binding: 1, resource: { buffer: baseBuffer } },
+        { binding: 2, resource: { buffer: outBuffer } },
+      ],
+    });
+
+    renderBindGroup = device.createBindGroup({
+      layout: renderPipeline.getBindGroupLayout(0),
+      entries: [
+        { binding: 0, resource: { buffer: uniformBuffer } },
+        { binding: 1, resource: { buffer: outBuffer } },
+      ],
+    });
+  }
+
+  allocateBuffers(currentCount);
 
   return {
+    setParticleCount(newCount) {
+      if (typeof newCount === 'number' && newCount > 0 && newCount !== currentCount) {
+        allocateBuffers(Math.floor(newCount));
+      }
+    },
+    getParticleCount() {
+      return currentCount;
+    },
     update(computePass) {
       computePass.setPipeline(computePipeline);
       computePass.setBindGroup(0, computeBindGroup);
-      computePass.dispatchWorkgroups(Math.ceil(PARTICLE_COUNT / 64));
+      computePass.dispatchWorkgroups(Math.ceil(currentCount / 64));
     },
     draw(renderPass) {
       renderPass.setPipeline(renderPipeline);
       renderPass.setBindGroup(0, renderBindGroup);
-      renderPass.draw(4, PARTICLE_COUNT);
+      renderPass.draw(4, currentCount);
     },
   };
 }

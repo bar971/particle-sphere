@@ -30,7 +30,26 @@ export async function createBloomPipeline(device, canvasFormat) {
 
   let res = {};
 
-  function resize(width, height) {
+  let currentThreshold = 1.1;
+  let currentIntensity = 0.7;
+  let currentVignette = 1.4;
+  let currentExposure = 0.85;
+
+    function applyParams() {
+      if (!res.brightUniform || !res.compositeUniform) return;
+      device.queue.writeBuffer(res.brightUniform, 0, new Float32Array([1 / res.width, 1 / res.height, 0, currentThreshold]));
+      device.queue.writeBuffer(res.compositeUniform, 0, new Float32Array([currentIntensity, currentVignette, currentExposure, 0]));
+    }
+
+    function updateParams(threshold, intensity, exposure, vignette) {
+      if (threshold !== undefined) currentThreshold = threshold;
+      if (intensity !== undefined) currentIntensity = intensity;
+      if (exposure !== undefined) currentExposure = exposure;
+      if (vignette !== undefined) currentVignette = vignette;
+      applyParams();
+    }
+
+    function resize(width, height) {
     if (res.sceneTex) {
       res.sceneTex.destroy();
       res.brightTex.destroy();
@@ -65,12 +84,11 @@ export async function createBloomPipeline(device, canvasFormat) {
     res.blurUniformV2 = device.createBuffer({ size: 16, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
     res.compositeUniform = device.createBuffer({ size: 16, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
 
-    device.queue.writeBuffer(res.brightUniform, 0, new Float32Array([1 / width, 1 / height, 0, 1.1]));
+    applyParams();
     device.queue.writeBuffer(res.blurUniformH, 0, new Float32Array([1 / hw, 1 / hh, 0, 0]));
     device.queue.writeBuffer(res.blurUniformV, 0, new Float32Array([1 / hw, 1 / hh, 2, 0]));
     device.queue.writeBuffer(res.blurUniformH2, 0, new Float32Array([1 / hw, 1 / hh, 0, 0]));
     device.queue.writeBuffer(res.blurUniformV2, 0, new Float32Array([1 / hw, 1 / hh, 2, 0]));
-    device.queue.writeBuffer(res.compositeUniform, 0, new Float32Array([0.7, 1.4, 0.85, 0]));
 
     res.brightBindGroup = device.createBindGroup({
       layout: brightPipeline.getBindGroupLayout(0),
@@ -147,6 +165,7 @@ export async function createBloomPipeline(device, canvasFormat) {
   return {
     resize,
     renderPost,
+    updateParams,
     getSceneView() {
       return res.sceneTex.createView();
     },

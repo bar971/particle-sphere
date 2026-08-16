@@ -1,16 +1,16 @@
 // Linee di energia: spirali procedurali sulla sfera, line-strip additive.
 // Il glow viene prodotto dal post-processing bloom, non dalla geometria.
 
-export const LINE_COUNT = 40;
-export const POINTS_PER_LINE = 128;
+export const DEFAULT_LINE_COUNT = 40;
+export const POINTS_PER_LINE = 512;
 
-function buildLines(radius) {
-  const total = LINE_COUNT * POINTS_PER_LINE;
+function buildLines(radius, lineCount = DEFAULT_LINE_COUNT) {
+  const total = lineCount * POINTS_PER_LINE;
   const data = new Float32Array(total * 4);
   let idx = 0;
-  for (let l = 0; l < LINE_COUNT; l++) {
+  for (let l = 0; l < lineCount; l++) {
     const turns = 2 + (l % 5);
-    const tiltAxis = (l / LINE_COUNT) * Math.PI * 2;
+    const tiltAxis = (l / lineCount) * Math.PI * 2;
     const tilt = 0.3 + 0.5 * Math.sin(l * 12.9898);
     for (let p = 0; p < POINTS_PER_LINE; p++) {
       const t = p / (POINTS_PER_LINE - 1);
@@ -37,16 +37,26 @@ function buildLines(radius) {
   return data;
 }
 
-export async function createLineSystem(device, uniformBuffer, sceneFormat, sphereRadius) {
-  const data = buildLines(sphereRadius);
+export async function createLineSystem(device, uniformBuffer, sceneFormat, sphereRadius, initialLineCount = DEFAULT_LINE_COUNT) {
+  let currentLineCount = initialLineCount;
+  let vertexBuffer = null;
 
-  const vertexBuffer = device.createBuffer({
-    size: data.byteLength,
-    usage: GPUBufferUsage.VERTEX,
-    mappedAtCreation: true,
-  });
-  new Float32Array(vertexBuffer.getMappedRange()).set(data);
-  vertexBuffer.unmap();
+  function allocateVertexBuffer(count) {
+    if (vertexBuffer) {
+      vertexBuffer.destroy();
+    }
+    currentLineCount = count;
+    const data = buildLines(sphereRadius, currentLineCount);
+    vertexBuffer = device.createBuffer({
+      size: data.byteLength,
+      usage: GPUBufferUsage.VERTEX,
+      mappedAtCreation: true,
+    });
+    new Float32Array(vertexBuffer.getMappedRange()).set(data);
+    vertexBuffer.unmap();
+  }
+
+  allocateVertexBuffer(currentLineCount);
 
   const code = await fetch('shaders/lines.render.wgsl').then((r) => r.text());
   const module = device.createShaderModule({ code });
@@ -85,11 +95,19 @@ export async function createLineSystem(device, uniformBuffer, sceneFormat, spher
   });
 
   return {
+    setLineCount(newCount) {
+      if (typeof newCount === 'number' && newCount > 0 && newCount !== currentLineCount) {
+        allocateVertexBuffer(Math.floor(newCount));
+      }
+    },
+    getLineCount() {
+      return currentLineCount;
+    },
     draw(renderPass) {
       renderPass.setPipeline(pipeline);
       renderPass.setBindGroup(0, bindGroup);
       renderPass.setVertexBuffer(0, vertexBuffer);
-      for (let l = 0; l < LINE_COUNT; l++) {
+      for (let l = 0; l < currentLineCount; l++) {
         renderPass.draw(POINTS_PER_LINE, 1, l * POINTS_PER_LINE, 0);
       }
     },
