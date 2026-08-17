@@ -95,16 +95,19 @@ fn paletteColor(t: f32, intensity: f32) -> vec4<f32> {
   let arancioNeon = vec3<f32>(1.0, 0.22, 0.0);
   let magentaNeon = vec3<f32>(1.0, 0.0, 0.48);
   let cianoNeon = vec3<f32>(0.0, 0.9, 1.0);
+  let verdeNeon = vec3<f32>(0.2, 1.0, 0.38);
 
   var col: vec3<f32>;
   if (tt < 0.15) {
     col = mix(arancioNeon, magentaNeon, tt / 0.15);
   } else if (tt < 0.55) {
     col = magentaNeon; // banda magenta/rosa neon dominante
-  } else if (tt < 0.75) {
-    col = mix(magentaNeon, cianoNeon, (tt - 0.55) / 0.2);
+  } else if (tt < 0.7) {
+    col = mix(magentaNeon, cianoNeon, (tt - 0.55) / 0.15);
+  } else if (tt < 0.82) {
+    col = mix(cianoNeon, verdeNeon, (tt - 0.7) / 0.12);
   } else if (tt < 0.9) {
-    col = mix(cianoNeon, magentaNeon, (tt - 0.75) / 0.15);
+    col = mix(verdeNeon, magentaNeon, (tt - 0.82) / 0.08);
   } else {
     col = mix(magentaNeon, arancioNeon, (tt - 0.9) / 0.1);
   }
@@ -155,7 +158,7 @@ fn main(@builtin(global_invocation_id) gid: vec3<u32>) {
   // Corpo: viola scuro fisso e uniforme (evita la tinta rossastra che il
   // colorPhase dava al corpo quando il rim e' al floor). Bordo: colore neon
   // della palette. La miscela e' guidata dal rim factor.
-  let corpoViola = vec3<f32>(0.16, 0.06, 0.26);
+  let corpoViola = vec3<f32>(0.045, 0.12, 0.19);
   let mixedCol = mix(corpoViola, col.rgb, smoothstep(0.04, 0.6, rim));
 
   outParticles[idx].pos = vec4<f32>(rotated, 1.0);

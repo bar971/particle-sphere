@@ -46,16 +46,19 @@ fn paletteColor(t: f32, intensity: f32) -> vec4<f32> {
   let arancioNeon = vec3<f32>(1.0, 0.22, 0.0);
   let magentaNeon = vec3<f32>(1.0, 0.0, 0.48);
   let cianoNeon = vec3<f32>(0.0, 0.9, 1.0);
+  let verdeNeon = vec3<f32>(0.2, 1.0, 0.38);
 
   var col: vec3<f32>;
   if (tt < 0.15) {
     col = mix(arancioNeon, magentaNeon, tt / 0.15);
   } else if (tt < 0.55) {
     col = magentaNeon;
-  } else if (tt < 0.75) {
-    col = mix(magentaNeon, cianoNeon, (tt - 0.55) / 0.2);
+  } else if (tt < 0.7) {
+    col = mix(magentaNeon, cianoNeon, (tt - 0.55) / 0.15);
+  } else if (tt < 0.82) {
+    col = mix(cianoNeon, verdeNeon, (tt - 0.7) / 0.12);
   } else if (tt < 0.9) {
-    col = mix(cianoNeon, magentaNeon, (tt - 0.75) / 0.15);
+    col = mix(verdeNeon, magentaNeon, (tt - 0.82) / 0.08);
   } else {
     col = mix(magentaNeon, arancioNeon, (tt - 0.9) / 0.1);
   }

@@ -10,6 +10,6 @@ export const menuItems:SphereMenuItem[]=[
   {id:'contatti',title:'Contatti',summary:'Hai un progetto in mente? Apriamo un canale e vediamo dove porta.',href:'/contatti',accentColor:'#baff63',position:{latitudeDeg:-27,longitudeDeg:116},icon:<Icon kind="M4 6h16v12H4zM4 7l8 6 8-6"/>},
 ];
 
-function Home(){const navigate=useNavigate();return <ParticleSphereMenu items={menuItems} debugControls={new URLSearchParams(location.search).get('debug')==='1'} onNavigate={(item,e)=>{if(item.target!=='_blank'){e.preventDefault();navigate(item.href)}}}/>}
+function Home(){const navigate=useNavigate(),debug=new URLSearchParams(location.search).get('debug');return <ParticleSphereMenu items={menuItems} debugControls={debug!=='0'} onNavigate={(item,e)=>{if(item.target!=='_blank'){e.preventDefault();navigate(item.href)}}}/>}
 function Page({item}:{item:SphereMenuItem}){return <main className="placeholder" style={{'--accent':item.accentColor} as React.CSSProperties}><a href="/" className="back">← Torna all’orbita</a><span className="eyebrow">SEZIONE / {item.id.toUpperCase()}</span><div className="page-icon">{item.icon}</div><h1>{item.title}</h1><p>{item.summary}</p><span className="coming">Contenuti in arrivo</span></main>}
 export function App(){return <Routes><Route path="/" element={<Home/>}/>{menuItems.map(item=><Route key={item.id} path={item.href} element={<Page item={item}/>}/>)}<Route path="*" element={<Navigate to="/" replace/>}/></Routes>}
