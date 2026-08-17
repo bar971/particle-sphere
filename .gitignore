@@ -4,7 +4,6 @@ dist/
 .wrangler/
 .DS_Store
 Thumbs.db
-Handoff.md
 .agents/
 .cursor/
 .vscode/
