@@ -103,10 +103,12 @@ Gli item senza posizione manuale ricevono coordinate stabili tramite distribuzio
 
 - Swipe sulla sfera con pointer capture.
 - Beacon con target touch ampi.
-- Scheda presentata come bottom sheet.
-- Dock inferiore con tutte le destinazioni, raggiungibile con il pollice.
+- Una sola etichetta contestuale resta visibile sulla sfera: normalmente quella del beacon più frontale, con priorità al beacon selezionato se visibile.
+- Gerarchia tipografica mobile dedicata: titolo più compatto, testo guida e microtesti con contrasto e dimensioni maggiori.
+- Scheda presentata come bottom sheet leggibile in portrait; su telefoni in landscape diventa un pannello laterale per non comprimere il contenuto.
+- Dock inferiore con tutte le destinazioni, etichette più leggibili e target touch ampi, raggiungibile con il pollice.
 - Menu completo sempre disponibile.
-- Safe area rispettata nella parte inferiore.
+- Safe area e viewport dinamica (`100dvh`) rispettate in alto e in basso, inclusi telefoni piccoli da 320 px e landscape touch.
 
 ### Beacon posteriori
 
@@ -180,7 +182,7 @@ La suite corrente copre:
 - pannello visuale abilitato/disabilitato;
 - beacon posteriori visibili ma non interattivi.
 
-Al momento dell’handoff risultano **12 test superati** e una build TypeScript/Vite valida.
+Al momento dell’handoff risultano **13 test superati** e una build TypeScript/Vite valida.
 
 ## Deployment Cloudflare
 

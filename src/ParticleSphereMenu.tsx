@@ -9,7 +9,7 @@ export interface ParticleSphereMenuProps { items:SphereMenuItem[]; autoRotate?:b
 export function ParticleSphereMenu({ items, autoRotate=true, rotationPeriodSeconds=20, onNavigate, debugControls=false, ariaLabel='Navigazione principale', className='' }:ParticleSphereMenuProps) {
   const stageRef=useRef<HTMLDivElement>(null), canvasRef=useRef<HTMLCanvasElement>(null), beaconRefs=useRef(new Map<string,HTMLAnchorElement>()), cardRef=useRef<HTMLElement>(null), lineRef=useRef<SVGLineElement>(null);
   const [selected,setSelected]=useState<SphereMenuItem|null>(null), [menuOpen,setMenuOpen]=useState(false), [gpu,setGpu]=useState<'loading'|'ready'|'fallback'>('loading'), [settingsOpen,setSettingsOpen]=useState(false);
-  const rendererRef=useRef<ParticleSphereRenderer|null>(null), secretTimer=useRef<number|undefined>(undefined);
+  const rendererRef=useRef<ParticleSphereRenderer|null>(null), secretTimer=useRef<number|undefined>(undefined), labelledBeaconRef=useRef<string|null>(null);
   const [visuals,setVisuals]=useState({particleCount:40000,lineCount:40,trailCount:16,spriteSize:.018});
   const selectedRef=useRef<SphereMenuItem|null>(null); selectedRef.current=selected;
   const positions=useMemo(()=>{ const automatic=distributeOnSphere(items.filter(i=>!i.position).length); let a=0; return new Map(items.map(i=>[i.id,latLngToCartesian(i.position??automatic[a++],1.04)])); },[items]);
@@ -23,9 +23,22 @@ export function ParticleSphereMenu({ items, autoRotate=true, rotationPeriodSecon
     createParticleSphereRenderer(canvas).then(r=>{if(disposed)r.destroy();else{renderer=rendererRef.current=r;setGpu('ready')}}).catch(()=>!disposed&&setGpu('fallback'));
     const tick=(now:number)=>{
       const dt=Math.min(.05,(now-previous)/1000); previous=now; rotation.select(Boolean(selectedRef.current),now); const orientation=rotation.update(dt,now); renderer?.render({time:now/1000,...orientation});
-      const rect=stage.getBoundingClientRect();
-      for(const item of items){const el=beaconRefs.current.get(item.id);if(!el)continue;const p=projectPoint(rotatePoint(positions.get(item.id)!,orientation.yaw,orientation.pitch),rect.width,rect.height);el.style.transform=`translate3d(${p.x}px,${p.y}px,0) translate(-50%,-50%) scale(${p.visible?p.scale:.68})`;el.style.opacity=p.visible?String(.35+.65*p.edge):'.14';el.style.pointerEvents=p.visible?'auto':'none';el.tabIndex=p.visible?0:-1;el.dataset.occluded=String(!p.visible);el.setAttribute('aria-hidden',String(!p.visible));}
-      const active=selectedRef.current, line=lineRef.current, card=cardRef.current;
+      const rect=stage.getBoundingClientRect(), active=selectedRef.current;
+      let frontmostId:string|null=null, frontmostDepth=-Infinity, activeVisible=false;
+      for(const item of items){
+        const el=beaconRefs.current.get(item.id);if(!el)continue;
+        const p=projectPoint(rotatePoint(positions.get(item.id)!,orientation.yaw,orientation.pitch),rect.width,rect.height);
+        el.style.transform=`translate3d(${p.x}px,${p.y}px,0) translate(-50%,-50%) scale(${p.visible?p.scale:.68})`;el.style.opacity=p.visible?String(.35+.65*p.edge):'.14';el.style.pointerEvents=p.visible?'auto':'none';el.tabIndex=p.visible?0:-1;el.dataset.occluded=String(!p.visible);el.setAttribute('aria-hidden',String(!p.visible));
+        if(p.visible&&p.depth>frontmostDepth){frontmostId=item.id;frontmostDepth=p.depth}
+        if(active?.id===item.id&&p.visible)activeVisible=true;
+      }
+      const labelId=active&&activeVisible?active.id:frontmostId;
+      if(labelledBeaconRef.current!==labelId){
+        if(labelledBeaconRef.current)beaconRefs.current.get(labelledBeaconRef.current)?.removeAttribute('data-label-visible');
+        if(labelId)beaconRefs.current.get(labelId)?.setAttribute('data-label-visible','true');
+        labelledBeaconRef.current=labelId;
+      }
+      const line=lineRef.current, card=cardRef.current;
       if(active&&line&&card){const b=beaconRefs.current.get(active.id)?.getBoundingClientRect(),c=card.getBoundingClientRect(),s=stage.getBoundingClientRect();if(b){line.setAttribute('x1',String(b.left+b.width/2-s.left));line.setAttribute('y1',String(b.top+b.height/2-s.top));line.setAttribute('x2',String(c.left+c.width/2-s.left));line.setAttribute('y2',String(c.top+c.height/2-s.top));}}
       raf=requestAnimationFrame(tick);
     }; raf=requestAnimationFrame(tick);
@@ -40,7 +53,7 @@ export function ParticleSphereMenu({ items, autoRotate=true, rotationPeriodSecon
   const updateVisual=(key:keyof typeof visuals,value:number)=>{const next={...visuals,[key]:value};setVisuals(next);rendererRef.current?.configure({[key]:value})};
   const startSecretPress=()=>{if(!debugControls)return;secretTimer.current=window.setTimeout(()=>setSettingsOpen(true),800)};
   const cancelSecretPress=()=>window.clearTimeout(secretTimer.current);
-  return <section ref={stageRef} className={`sphere-menu ${className}`} aria-label={ariaLabel} onClick={e=>{if(e.target===e.currentTarget)setSelected(null)}}>
+  return <section ref={stageRef} className={`sphere-menu ${selected?'has-selection':''} ${className}`.trim()} aria-label={ariaLabel} onClick={e=>{if(e.target===e.currentTarget)setSelected(null)}}>
     <canvas ref={canvasRef} className="sphere-canvas" aria-hidden="true" />
     <div className="ambient" aria-hidden="true" />
     <header className="hero-copy"><button className="eyebrow secret-trigger" aria-label="Portfolio 2026" onDoubleClick={()=>debugControls&&setSettingsOpen(true)} onPointerDown={startSecretPress} onPointerUp={cancelSecretPress} onPointerCancel={cancelSecretPress} onPointerLeave={cancelSecretPress}>PORTFOLIO / 2026</button><h1>Idee in<br/><em>orbita.</em></h1><p>Trascina la sfera. Tocca un segnale.<br/>Scopri cosa c’è dall’altra parte.</p></header>
