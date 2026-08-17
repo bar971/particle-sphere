@@ -57,8 +57,19 @@
   .hero-copy{top:calc(max(12px,env(safe-area-inset-top)) + 44px);left:22px;right:auto;width:42vw}
   .hero-copy h1{font-size:clamp(36px,7vw,44px);margin:10px 0 12px}
   .hero-copy p{font-size:13px;max-width:280px}
-  .detail-card{left:auto;right:12px;top:calc(max(12px,env(safe-area-inset-top)) + 50px);bottom:calc(86px + env(safe-area-inset-bottom));width:min(390px,46vw);max-height:none;border-radius:18px;padding:25px 22px 18px}
+  .mobile-dock{display:none}
+  .detail-card{left:auto;right:12px;top:calc(max(12px,env(safe-area-inset-top)) + 50px);bottom:max(12px,env(safe-area-inset-bottom));width:min(390px,46vw);max-height:none;border-radius:18px;padding:25px 22px 18px}
   .detail-card h2{font-size:27px;margin-top:12px}
   .detail-card p{font-size:13px;margin:9px 0 14px}
   .all-menu{width:min(440px,65vw)}
+}
+
+@media(max-width:900px) and (pointer:coarse) and (orientation:portrait){
+  .hero-copy .eyebrow{font-size:12px}
+  .hero-copy h1{font-size:clamp(46px,13vw,60px)}
+  .hero-copy p{font-size:17px;line-height:1.55}
+  .beacon span{font-size:13px;padding:7px 9px}
+  .mobile-dock small{font-size:11px}
+  .detail-card p{font-size:16px}
+  .explore{font-size:12px}
 }
