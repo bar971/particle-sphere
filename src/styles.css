@@ -6,13 +6,13 @@
 
 .hero-copy h1,.detail-card h2,.placeholder h1{text-wrap:balance}.hero-copy p,.detail-card p,.all-menu small,.placeholder p{text-wrap:pretty}
 
-@media(max-width:720px),(max-height:520px) and (pointer:coarse){
+@media(max-width:900px),(max-height:520px) and (pointer:coarse){
   html,body,#root{height:100dvh;min-height:100dvh}
   .sphere-menu{height:100dvh;min-height:100dvh}
   .hero-copy{top:calc(max(18px,env(safe-area-inset-top)) + 70px);left:clamp(18px,6vw,28px);right:18px;transform:none;transition:opacity .18s ease-out}
   .hero-copy .eyebrow{font-size:11px;color:#d0c6d8}
-  .hero-copy h1{font-size:clamp(42px,13vw,52px);line-height:.88;margin:14px 0 18px}
-  .hero-copy p{color:#c5bccd;font-size:clamp(14px,4vw,15px);line-height:1.55;margin:0;max-width:310px}
+  .hero-copy h1{font-size:clamp(38px,10vw,46px);line-height:.9;margin:14px 0 18px}
+  .hero-copy p{color:#d4ccda;font-size:clamp(15px,4vw,16px);line-height:1.55;margin:0;max-width:330px}
   .sphere-menu.has-selection .hero-copy{opacity:.18}
   .menu-toggle{top:max(14px,env(safe-area-inset-top));right:12px;min-height:46px;padding:8px 9px 8px 16px;font-size:11px;gap:12px}
   .menu-toggle b{width:30px;height:30px;font-size:10px}
@@ -27,10 +27,12 @@
   .detail-card .close{min-width:44px;min-height:44px;right:7px;top:5px}
   .card-index{font-size:10px}
   .explore{min-height:48px;padding:13px 16px;font-size:11px}
-  .mobile-dock{display:flex;left:8px;right:8px;bottom:max(8px,env(safe-area-inset-bottom));height:74px;padding:5px;gap:2px}
-  .mobile-dock button{min-height:54px;gap:5px}
+  .mobile-dock{position:absolute;z-index:18;display:flex;left:8px;right:8px;bottom:max(8px,env(safe-area-inset-bottom));height:74px;padding:5px;gap:2px;background:#0b0815ee;border:1px solid #ffffff20;border-radius:18px;backdrop-filter:blur(20px)}
+  .mobile-dock button{flex:1;min-width:0;min-height:54px;padding:0 2px;color:#aaa1b3;background:transparent;border:0;border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+  .mobile-dock button.active{background:#ffffff10;color:#fff}
+  .mobile-dock button:focus-visible{outline:2px solid #fff;outline-offset:-3px}
   .mobile-dock svg{width:20px;height:20px}
-  .mobile-dock small{font-size:9px;line-height:1.1}
+  .mobile-dock small{font-size:10px;line-height:1.1}
   .all-menu{width:100%;height:100dvh;padding:calc(max(22px,env(safe-area-inset-top)) + 8px) 20px calc(94px + env(safe-area-inset-bottom));transition-duration:.18s;transition-timing-function:ease-out}
   .all-menu-head{font-size:11px;margin-bottom:30px}
   .all-menu-head button{min-width:44px;min-height:44px}
@@ -44,10 +46,10 @@
 
 @media(max-width:350px) and (orientation:portrait){
   .hero-copy{top:calc(max(14px,env(safe-area-inset-top)) + 62px)}
-  .hero-copy h1{font-size:42px;margin-bottom:14px}
-  .hero-copy p{font-size:14px;max-width:270px}
+  .hero-copy h1{font-size:38px;margin-bottom:14px}
+  .hero-copy p{font-size:15px;max-width:285px}
   .mobile-dock{left:5px;right:5px}
-  .mobile-dock small{font-size:8px}
+  .mobile-dock small{font-size:9px}
   .detail-card{left:7px;right:7px;padding-left:20px;padding-right:20px}
 }
 
