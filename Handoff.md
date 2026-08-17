@@ -186,6 +186,14 @@ Al momento dell’handoff risultano **13 test superati** e una build TypeScript/
 
 ## Deployment Cloudflare
 
+### Stato al 17 agosto 2026
+
+- Il fix mobile più recente è nel commit `8b9154f` (`Fix mobile dock across responsive breakpoints`) ed è già presente su `origin/main`.
+- Il fix estende il layout mobile fino a 900 px e applica anche in landscape touch tutti gli stili strutturali del dock; evita così che i pulsanti ricadano nell’aspetto nativo bianco del browser.
+- Test e build del commit risultano validi: **13 test superati** e output Vite generato correttamente.
+- Il deployment automatico del commit è in attesa a causa di un problema segnalato nell’integrazione GitHub/Cloudflare. Al momento dell’ultimo controllo, la produzione serviva ancora il commit precedente `65dc98f` con gli asset `index-BY3TL3Ho.js` e `index-GI85Yk9S.css`.
+- Non è necessario creare altri commit per riattivare il deploy: attendere il ripristino del servizio e verificare che Cloudflare acquisisca `8b9154f`.
+
 Configurazione richiesta:
 
 ```text
