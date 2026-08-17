@@ -16,7 +16,7 @@ struct TrailData {
 
 // Pool di scie attive: array a dimensione fissa in uno storage buffer, indicizzato
 // da instance_index. Deve rispecchiare MAX_TRAILS in js/trail.js.
-const MAX_TRAILS: u32 = 16u;
+const MAX_TRAILS: u32 = 150u;
 
 @group(0) @binding(0) var<uniform> uniforms: Uniforms;
 @group(0) @binding(1) var<storage, read> trails: array<TrailData, MAX_TRAILS>;

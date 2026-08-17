@@ -45,7 +45,7 @@ async function init() {
   const [particleSystem, lineSystem, trailSystem, bloomFx, backgroundFx] = await Promise.all([
     createParticleSystem(device, uniformBuffer, SCENE_FORMAT, params.particleCount),
     createLineSystem(device, uniformBuffer, SCENE_FORMAT, SPHERE_RADIUS, params.lineCount),
-    createTrailSystem(device, uniformBuffer, SCENE_FORMAT, SPHERE_RADIUS),
+    createTrailSystem(device, uniformBuffer, SCENE_FORMAT, SPHERE_RADIUS, params.trailCount),
     createBloomPipeline(device, canvasFormat),
     createBackgroundPipeline(device, SCENE_FORMAT),
   ]);
@@ -61,6 +61,8 @@ async function init() {
       particleSystem.setParticleCount(value);
     } else if (key === 'lineCount') {
       lineSystem.setLineCount(value);
+    } else if (key === 'trailCount') {
+      trailSystem.setTrailCount(value);
     }
   });
 

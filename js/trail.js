@@ -3,9 +3,8 @@
 // nastro di triangoli (non piu' una linea 1px): lo spessore e' massimo alla testa
 // e si assottiglia verso la coda seguendo la stessa intensita' del bagliore.
 //
-// Pool dinamico: piu' scie possono essere attive contemporaneamente (fino a
-// MAX_TRAILS, riciclate quando finiscono la loro vita). Compaiono a intervalli
-// casuali indipendenti da quante sono gia' attive.
+// Pool dinamico: il numero di scie concorrenti e' configurabile in tempo reale
+// fino a MAX_TRAILS. Gli slot vengono riciclati quando una scia termina.
 //
 // La scia co-ruota con la sfera (stessa fase/rotationY di particelle e linee), ma
 // la sua geometria (arco/asse/durata/colore) e il suo scheduling nel tempo sono
@@ -16,16 +15,8 @@
 import { vec3Normalize, vec3Cross } from './math.js';
 
 export const POINTS_PER_TRAIL = 128; // deve rispecchiare NUM_POINTS in shaders/trail.render.wgsl
-export const MAX_TRAILS = 16; // deve rispecchiare MAX_TRAILS in shaders/trail.render.wgsl
+export const MAX_TRAILS = 150; // deve rispecchiare MAX_TRAILS in shaders/trail.render.wgsl
 const FLOATS_PER_TRAIL = 16; // u(vec4) + v(vec4) + params(vec4) + params2(vec4)
-
-// --- Parametri di SCHEDULING (definitivi) ---
-// Intervallo casuale uniforme tra 2 e 8 secondi, sia per il primo spawn che per i
-// successivi; indipendente da quante scie sono attualmente attive.
-const SPAWN_MIN_SEC = 2;
-const SPAWN_MAX_SEC = 8;
-const FIRST_SPAWN_MIN_SEC = 2;
-const FIRST_SPAWN_MAX_SEC = 8;
 
 // --- Parametri della scia ---
 const ARC_MIN_DEG = 90; // lunghezza minima dell'arco
@@ -58,7 +49,7 @@ function randomArcBasis() {
   return { u, v };
 }
 
-export async function createTrailSystem(device, uniformBuffer, sceneFormat, sphereRadius) {
+export async function createTrailSystem(device, uniformBuffer, sceneFormat, sphereRadius, initialTrailCount = 16) {
   const radius = sphereRadius * 1.01; // leggermente sopra la superficie, come le linee
 
   // Storage buffer con il pool di scie attive (dimensione fissa, slot riciclati).
@@ -104,10 +95,10 @@ export async function createTrailSystem(device, uniformBuffer, sceneFormat, sphe
 
   const uniformData = new Float32Array(MAX_TRAILS * FLOATS_PER_TRAIL);
 
-  // Stato dello scheduler: array di scie attive (pool dinamico, riciclato) e tempo
-  // assoluto del prossimo tentativo di spawn.
+  // Stato del pool dinamico. Il valore richiesto e' sempre limitato alla capienza
+  // del buffer, anche se viene modificato da codice esterno alla GUI.
   let activeTrails = [];
-  let nextSpawnTime = randRange(FIRST_SPAWN_MIN_SEC, FIRST_SPAWN_MAX_SEC);
+  let targetTrailCount = Math.max(1, Math.min(MAX_TRAILS, Math.round(initialTrailCount)));
   let activeCount = 0;
 
   function spawnTrail(startTime) {
@@ -139,18 +130,19 @@ export async function createTrailSystem(device, uniformBuffer, sceneFormat, sphe
   // rawTSec: tempo assoluto trascorso (secondi), NON modulo LOOP_PERIOD - lo
   // scheduling delle scie e' volutamente indipendente dal loop seamless da 20s.
   function update(rawTSec) {
-    // Tentativo di spawn: indipendente da quante scie sono gia' attive. Se il pool
-    // e' pieno lo spawn viene saltato in silenzio, ma il prossimo tentativo viene
-    // comunque schedulato normalmente.
-    if (rawTSec >= nextSpawnTime) {
-      if (activeTrails.length < MAX_TRAILS) {
-        activeTrails.push(spawnTrail(rawTSec));
-      }
-      nextSpawnTime = rawTSec + randRange(SPAWN_MIN_SEC, SPAWN_MAX_SEC);
-    }
-
     // Rimuove le scie a fine vita (testa arrivata + coda spenta + fade-out).
     activeTrails = activeTrails.filter((trail) => rawTSec - trail.startTime < trail.totalDuration);
+
+    // Mantiene esattamente il numero richiesto. Le nuove scie partono con un'eta'
+    // casuale per evitare che un aumento dello slider le sincronizzi visivamente.
+    if (activeTrails.length > targetTrailCount) {
+      activeTrails.length = targetTrailCount;
+    }
+    while (activeTrails.length < targetTrailCount) {
+      const trail = spawnTrail(rawTSec);
+      trail.startTime -= Math.random() * trail.headDuration;
+      activeTrails.push(trail);
+    }
 
     activeCount = activeTrails.length;
     for (let i = 0; i < activeCount; i++) {
@@ -172,6 +164,9 @@ export async function createTrailSystem(device, uniformBuffer, sceneFormat, sphe
 
   return {
     update,
+    setTrailCount(value) {
+      targetTrailCount = Math.max(1, Math.min(MAX_TRAILS, Math.round(value)));
+    },
     isActive() {
       return activeCount > 0;
     },

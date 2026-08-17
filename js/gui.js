@@ -14,6 +14,7 @@ export const defaultParams = {
   showLines: true,
   lineCount: 40,
   showTrails: true,
+  trailCount: 16,
 };
 
 export const params = { ...defaultParams };
@@ -286,6 +287,12 @@ export function initGUI() {
       </label>
     </div>
 
+    <div class="gui-row" style="padding-left: 12px;">
+      <span class="gui-label">N. Scie</span>
+      <input type="range" class="gui-slider" id="param-trailCount" min="1" max="150" step="1" value="${params.trailCount}">
+      <span class="gui-val" id="val-trailCount">${params.trailCount}</span>
+    </div>
+
     <button class="gui-btn-reset" id="gui-btn-reset">Ripristina Valori Predefiniti</button>
     <div class="gui-shortcut-tip">Premi 'H' per nascondere la GUI</div>
   `;
@@ -317,6 +324,7 @@ export function initGUI() {
     { id: 'vignette', format: (v) => Number(v).toFixed(1) },
     { id: 'particleCount', format: (v) => `${(Number(v) / 1000).toFixed(0)}k` },
     { id: 'lineCount', format: (v) => `${Number(v)}` },
+    { id: 'trailCount', format: (v) => `${Number(v)}` },
     { id: 'rotationSpeed', format: (v) => `${Number(v).toFixed(2)}x` },
     { id: 'spriteSize', format: (v) => Number(v).toFixed(3) },
   ];
