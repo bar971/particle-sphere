@@ -1,47 +1,11 @@
 <!doctype html>
 <html lang="it">
-<head>
-<meta charset="utf-8" />
-<title>Particle Sphere</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    background: #000;
-    overflow: hidden;
-  }
-  canvas {
-    display: block;
-    width: 100vw;
-    height: 100vh;
-  }
-  #fallback {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: #000;
-    color: #eee;
-    font-family: system-ui, sans-serif;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 2rem;
-    box-sizing: border-box;
-  }
-</style>
-</head>
-<body>
-<canvas id="gpu-canvas"></canvas>
-<div id="fallback">
-  <div>
-    <h1>WebGPU non disponibile</h1>
-    <p>Questo browser non supporta WebGPU oppure la pagina non è servita in un contesto sicuro (HTTPS o localhost).</p>
-    <p>Usa un browser aggiornato con WebGPU abilitato (es. Chrome recente) e apri la pagina tramite un server HTTP locale.</p>
-  </div>
-</div>
-<script type="module" src="js/main.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#07050f" />
+    <meta name="description" content="Un portfolio da esplorare, sospeso in una sfera di particelle." />
+    <title>Orbita — portfolio</title>
+  </head>
+  <body><div id="root"></div><script type="module" src="/src/main.tsx"></script></body>
 </html>

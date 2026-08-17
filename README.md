@@ -1,25 +1,38 @@
-# Particle Sphere
+# Particle Sphere Menu
 
-Sfera di 40.000 particelle realizzata in WebGPU puro (nessuna libreria: no Three.js, nessuna dipendenza esterna), con rim lighting neon, bloom, linee di energia procedurali e scie luminose casuali. Loop seamless di 20 secondi.
+Homepage immersiva React con una sfera WebGPU da 40.000 particelle. Cinque beacon navigano tra Profilo, Progetti, Lab, Note e Contatti; su mobile sono disponibili swipe, bottom sheet e dock rapido.
 
 ## Demo
 
 https://particle-sphere.pages.dev
 
-## Requisiti
+## Sviluppo
 
-Un browser con supporto WebGPU (es. Chrome o Edge recenti). WebGPU richiede un secure context, quindi la pagina va servita via HTTP/HTTPS e non aperta direttamente da file locale (`file://`).
-
-## Esecuzione in locale
-
-```
-python -m http.server 8420
+```bash
+npm install
+npm run dev
 ```
 
-Poi apri http://localhost:8420 nel browser.
+Test e build di produzione:
 
-## Struttura del progetto
+```bash
+npm test
+npm run build
+```
 
-- `index.html` — canvas full-viewport e inizializzazione WebGPU
-- `js/` — logica applicativa (init WebGPU, particelle, linee, bloom, sfondo, scie luminose, matematica)
-- `shaders/` — shader WGSL (compute e render) per particelle, linee, bloom, sfondo, scie
+## Cloudflare Pages
+
+- Build command: `npm run build`
+- Output directory: `dist`
+
+La regola `public/_redirects` abilita refresh e accesso diretto alle route SPA.
+
+## Architettura
+
+- `src/ParticleSphereMenu.tsx` — componente riutilizzabile, beacon e interazioni
+- `src/webgpu-core.ts` — lifecycle WebGPU indipendente da React
+- `src/sphereMath.ts` — distribuzione, orientamento, proiezione e visibilità
+- `src/App.tsx` — dati e routing della demo
+- `js/` e `shaders/` — sistemi grafici WebGPU
+
+Senza WebGPU l’interfaccia passa automaticamente alla modalità CSS con menu completo. Il pannello diagnostico è disponibile solo con `?debug=1`; in quella modalità il tasto `H` lo mostra o nasconde.
