@@ -39,7 +39,7 @@ La build di produzione deve generare `dist`. Non pubblicare la root del reposito
 
 - `src/main.tsx`: bootstrap React, Strict Mode e `BrowserRouter`.
 - `src/App.tsx`: unica sorgente dati per le cinque destinazioni e route placeholder.
-- `src/ParticleSphereMenu.tsx`: componente riutilizzabile, beacon, scheda, menu alternativo, dock mobile, drag e pannello visuale.
+- `src/ParticleSphereMenu.tsx`: componente riutilizzabile, beacon, scheda, menu alternativo, drag e pannello visuale.
 - `src/styles.css`: interfaccia desktop/mobile, fallback, animazioni e accessibilità motion.
 
 React Router resta intenzionalmente fuori da `ParticleSphereMenu`: l’app intercetta `onNavigate`, mentre il componente continua a esporre link HTML standard.
@@ -106,7 +106,7 @@ Gli item senza posizione manuale ricevono coordinate stabili tramite distribuzio
 - Una sola etichetta contestuale resta visibile sulla sfera: normalmente quella del beacon più frontale, con priorità al beacon selezionato se visibile.
 - Gerarchia tipografica mobile dedicata: titolo più compatto, testo guida e microtesti con contrasto e dimensioni maggiori.
 - Scheda presentata come bottom sheet leggibile in portrait; su telefoni in landscape diventa un pannello laterale per non comprimere il contenuto.
-- Dock inferiore con tutte le destinazioni, etichette più leggibili e target touch ampi, raggiungibile con il pollice.
+- Il blocco introduttivo “PORTFOLIO / 2026” parte da 18 px dal bordo superiore, oltre alla safe area del dispositivo.
 - Menu completo sempre disponibile.
 - Safe area e viewport dinamica (`100dvh`) rispettate in alto e in basso, inclusi telefoni piccoli da 320 px e landscape touch.
 
@@ -177,7 +177,7 @@ La suite corrente copre:
 - selezione, arresto e ripresa;
 - movimento ridotto;
 - menu semantico e link standard;
-- apertura e chiusura della scheda;
+- assenza del dock mobile e selezione tramite beacon;
 - callback di navigazione;
 - pannello visuale abilitato/disabilitato;
 - beacon posteriori visibili ma non interattivi.
@@ -188,11 +188,11 @@ Al momento dell’handoff risultano **13 test superati** e una build TypeScript/
 
 ### Stato al 17 agosto 2026
 
-- Il fix mobile più recente è nel commit `8b9154f` (`Fix mobile dock across responsive breakpoints`) ed è già presente su `origin/main`.
-- Il fix estende il layout mobile fino a 900 px e applica anche in landscape touch tutti gli stili strutturali del dock; evita così che i pulsanti ricadano nell’aspetto nativo bianco del browser.
-- Test e build del commit risultano validi: **13 test superati** e output Vite generato correttamente.
-- Il deployment automatico del commit è in attesa a causa di un problema segnalato nell’integrazione GitHub/Cloudflare. Al momento dell’ultimo controllo, la produzione serviva ancora il commit precedente `65dc98f` con gli asset `index-BY3TL3Ho.js` e `index-GI85Yk9S.css`.
-- Non è necessario creare altri commit per riattivare il deploy: attendere il ripristino del servizio e verificare che Cloudflare acquisisca `8b9154f`.
+- Il commit `8b9154f` (`Fix mobile dock across responsive breakpoints`) è già presente su `origin/main`.
+- L’aggiornamento più recente rimuove il dock mobile e porta il blocco introduttivo a 18 px dal bordo superiore, rispettando la safe area.
+- Test e build dell’aggiornamento più recente risultano validi: **13 test superati** e output Vite generato correttamente.
+- Lo stato del deployment Cloudflare non è stato ricontrollato dopo quest’ultimo aggiornamento.
+- Dopo il push, verificare che Cloudflare acquisisca il commit più recente e pubblichi gli asset aggiornati.
 
 Configurazione richiesta:
 

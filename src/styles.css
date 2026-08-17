@@ -73,3 +73,5 @@
   .detail-card p{font-size:16px}
   .explore{font-size:12px}
 }
+
+@media(max-width:900px),(max-height:520px) and (pointer:coarse){.hero-copy{top:max(18px,env(safe-area-inset-top))}}
